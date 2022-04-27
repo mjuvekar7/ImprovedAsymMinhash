@@ -1,8 +1,8 @@
 """
 Partition into equal width partitions.
 Input: a dictionary of the form {set_id : set}, a positive integer nparts
-Output: a partition (list of dictionaries each of the form {set_id : set}) into
-        nparts parts such that each part has the same number of sets.
+Output: an equal width partitioning of the set (list of dictionaries each of the
+        form {set_id : set})
 """
 def equalWidthPartition(sets, nparts):
     pass # TODO
