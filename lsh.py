@@ -13,14 +13,13 @@ def band_hash(signature):
     return hash(str(band))
 
 
-
 """
 An LSH index.
 """
 class LSHIndex:
     """
     Input: self.signatures should be of the form {set_name : minhash_signature}
-    Output: LSH index, i.e. list of LSH_B dicts each of the form
+    Output: LSH index, i.e. list of b dicts each of the form
     {bucket_id : set_id}.
     """
     def build_lsh_index(self):
@@ -61,7 +60,7 @@ class LSHIndex:
 
     """
     Constructor.
-    Signatures should be in the form { set_id : signature }.
+    lsh_signatures should be a dictionary of the form { set_id : signature }.
     lsh_hashfunc should be a function that takes a band and hashes to an integer.
     """
     def __init__(self, lsh_b, lsh_r, lsh_hashfunc, lsh_signatures):

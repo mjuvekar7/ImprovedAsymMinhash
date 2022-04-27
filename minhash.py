@@ -62,6 +62,7 @@ class MinHasher:
 
     """
     Generate the minhash signature of a set.
+    Minhash signatures are returned as lists.
     """
     def minhash(self, in_set):
         signature = [inf] * len(self.hash_params)
@@ -74,7 +75,27 @@ class MinHasher:
         return signature
 
     """
+    Get signatures for all sets.
+    Output: { set_id : signature }
+    """
+    def getAllSignatures(self):
+        if len(self.signatures) == len(self.sets):
+            return self.signatures
+
+        sigs = {}
+        for set_id, dataset in self.sets.items():
+            signature = self.minhash(dataset)
+            sigs[set_id] = signature
+
+        self.signatures = sigs
+        return sigs
+
+    """
     Constructor.
+    datasets must be a dictionary of the form { set_id : set }
+    hashparam_file should be a file path. The file should contain lines each of
+    the form a,b,c where a, b, and c will be used as universal hash function
+    parameters.
     """
     def __init__(self, datasets, hashparam_file="minhash_params", generate=False):
         self.sets = datasets
@@ -83,4 +104,7 @@ class MinHasher:
             self.hash_params = generateParameters(hashparam_file)
         else:
             self.hash_params = loadParameters(hashparam_file)
+        self.signatures = {} # no need to compute all signatures unless required.
+                             # all signatures will be computed and saved when
+                             # first requested.
 
