@@ -4,6 +4,9 @@ Input: a dictionary of the form {set_id : set}, a positive integer nparts
 Output: an equal width partitioning of the set (list of dictionaries each of the
         form {set_id : set})
 """
+from json.encoder import INFINITY
+
+
 def equalWidthPartition(sets, nparts):
     """
     is the argument 'sets' referring to one {set_id :set} instance or does refer to a dictionary that contains multiple instances of {set_id : set}?
@@ -14,8 +17,26 @@ def equalWidthPartition(sets, nparts):
 
     On return, what keys will the partitioned dictionaries be described with?
     """
+    map_ret = {}
+    for key, seti in sets.items():
+        min_v = min(seti)
+        w = int((max(seti) - min_v)/ nparts)
 
-    pass # TODO
+        arr = []
+        for i in range(0, nparts +  1):
+            arr = arr + [min_v + w*i]
+        
+        arri = []
+        for i in range(0, nparts):
+            temp = []
+            for j in seti:
+                if j >= arr[i] and j <= arr[i+1]:
+                    temp += [j]
+            arri += [temp]
+
+        map_ret[key] = arri
+    return map_ret
+
 
 
 """
@@ -27,7 +48,22 @@ def equalDepthPartition(sets, nparts):
     """
     What does an equal depth partition mean?
     """
-    pass # TODO
+    map_ret = {}
+    for key, seti in sets.items():
+        a = len(seti)
+        n = int(a/nparts)
+
+        arr = []
+        for i in range(0, nparts):
+            temp = []
+            for j in range(i*n, (i + 1) * n):
+                if j >= a:
+                    break
+                temp += [seti[j]]
+            arr += [temp]
+        
+        map_ret[key] = arr
+    return map_ret
 
 """
 
@@ -37,35 +73,7 @@ TODO figure this out
 def ourPartitioningScheme(sets, nparts):
     pass # TODO
 
-
-
-# equal frequency
-def equifreq(arr1, m):   
-    a = len(arr1)
-    n = int(a / m)
-    for i in range(0, m):
-        arr = []
-        for j in range(i * n, (i + 1) * n):
-            if j >= a:
-                break
-            arr = arr + [arr1[j]]
-        print(arr)
  
-# equal width
-def equiwidth(arr1, m):
-    a = len(arr1)
-    w = int((max(arr1) - min(arr1)) / m)
-    min1 = min(arr1)
-    arr = []
-    for i in range(0, m + 1):
-        arr = arr + [min1 + w * i]
-    arri=[]
-     
-    for i in range(0, m):
-        temp = []
-        for j in arr1:
-            if j >= arr[i] and j <= arr[i+1]:
-                temp += [j]
-        arri += [temp]
-    print(arri)
- 
+
+print(equalWidthPartition({"hey": [5,10,11,13,15,35,50,55,72,92,204,215], "hn": [2,10,11,13,5,35,100,55,72,92,9,21], "heyn": [2,10,11,13,15,35,50,55,72,92,9,21]}, 3))
+print(equalDepthPartition({"hey": [5,10,11,13,15,35,50,55,72,92,204,215], "hn": [2,10,11,13,5,35,100,55,72,92,9,21], "heyn": [2,10,11,13,15,35,50,55,72,92,9,21]}, 3))
