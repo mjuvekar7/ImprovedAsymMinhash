@@ -7,7 +7,7 @@ A simple implementation of asymmetric minwise hashing.
 from lsh import LSHIndex, band_hash
 from minhash import MinHasher
 
-class AsymmetricMinwiseHashing:
+class AsymmetricMinwiseHasher:
     """
     Query index for a given set. Return all candidates.
     """
@@ -21,7 +21,7 @@ class AsymmetricMinwiseHashing:
     Output: dictionary of the form {set_id : set_padded }
     """
     def padSets(sets):
-        PADDING = "PaDdInG_vAlUe"
+        PADDING = "PaDdInG_vAlUe_"
         
         # Find largest size and compute vocab
         largest_size = 0
