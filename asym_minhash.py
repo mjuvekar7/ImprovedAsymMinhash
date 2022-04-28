@@ -1,3 +1,9 @@
+"""
+asym_minhash.py
+
+A simple implementation of asymmetric minwise hashing.
+"""
+
 from lsh import LSHIndex, band_hash
 from minhash import MinHasher
 

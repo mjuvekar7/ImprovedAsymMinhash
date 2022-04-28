@@ -1,6 +1,5 @@
 """
 minhash.py
-Author: Mandar Juvekar
 
 A simple minwise hashing implementation.
 """

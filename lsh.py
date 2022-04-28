@@ -1,6 +1,5 @@
 """
 lsh.py
-Author: Mandar Juvekar
 
 A simple locality sensitive hashing implementation.
 Designed for use with minhash.

@@ -1,4 +1,10 @@
 """
+partitioning.py
+
+Functions to partition collections of sets.
+"""
+
+"""
 Partition into equal width partitions.
 Input: a dictionary of the form {set_id : set}, a positive integer nparts
 Output: an equal width partitioning of the set (list of dictionaries each of the
