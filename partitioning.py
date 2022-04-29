@@ -4,46 +4,30 @@ partitioning.py
 Functions to partition collections of sets.
 """
 
+from math import inf
+
 """
 Partition into equal width partitions.
 Input: a dictionary of the form {set_id : set}, a positive integer nparts
 Output: an equal width partitioning of the set (list of dictionaries each of the
         form {set_id : set})
 """
-from json.encoder import INFINITY
-
-
 def equalWidthPartition(sets, nparts):
-    """
-    is the argument 'sets' referring to one {set_id :set} instance or does refer to a dictionary that contains multiple instances of {set_id : set}?
+    sets_sorted = sorted(sets.items(), key=lambda x: len(x[1]))
+    width = (len(sets_sorted[-1][1]) - len(sets_sorted[0][1])) / nparts
+    min1 = len(sets_sorted[0][1])
+    boundaries = [min1 + i * width for i in range(nparts)]
+    boundaries.append(inf)
 
-    If it contains one instance of {set_id : set} only, it would be easy to just partition the values in that instance into nparts and return the nparts as dictionaries
-    However, if there were multiple {set_id : set} instances, how does one partition them without accounting for if those different instances of {set_id : set} were unrelated?
-    Is it possible to jumble all all the dictionary values of the different instances into one big set and then partition from there? 
+    partition = []
+    for i in range(nparts):
+        temp = []
+        for s in sets_sorted:
+            if len(s[1]) >= boundaries[i] and len(s[1]) < boundaries[i+1]:
+                temp.append(s)
+        partition.append(dict(temp))
 
-    On return, what keys will the partitioned dictionaries be described with?
-    """
-    map_ret = {}
-    for key, seti in sets.items():
-        min_v = min(seti)
-        w = int((max(seti) - min_v)/ nparts)
-
-        arr = []
-        for i in range(0, nparts +  1):
-            arr = arr + [min_v + w*i]
-        
-        arri = []
-        for i in range(0, nparts):
-            temp = []
-            for j in seti:
-                if j >= arr[i] and j <= arr[i+1]:
-                    temp += [j]
-            arri += [temp]
-
-        map_ret[key] = arri
-    return map_ret
-
-
+    return partition
 
 """
 Partition into equal depth partitions.
@@ -51,34 +35,24 @@ Input: a dictionary of the form {set_id : set}, a positive integer nparts
 Output: an equal depth partition (same output format as above).
 """
 def equalDepthPartition(sets, nparts):
-    """
-    What does an equal depth partition mean?
-    """
-    map_ret = {}
-    for key, seti in sets.items():
-        a = len(seti)
-        n = int(a/nparts)
-
-        arr = []
-        for i in range(0, nparts):
-            temp = []
-            for j in range(i*n, (i + 1) * n):
-                if j >= a:
-                    break
-                temp += [seti[j]]
-            arr += [temp]
-        
-        map_ret[key] = arr
-    return map_ret
+    partition = []
+    sets_sorted = sorted(sets.items(), key=lambda x: len(x[1]))
+    depth = int(len(sets) / nparts)
+    mod = len(sets) % nparts
+    last_end = 0
+    for i in range(nparts):
+        if i < mod:
+            partition.append(sets_sorted[last_end : last_end + depth + 1])
+            last_end += depth + 1
+        else:
+            partition.append(sets_sorted[last_end : last_end + depth])
+            last_end += depth
+    return partition
 
 """
-
-
-TODO figure this out
+Partition that minimizes the sum
+\sum_{part} |part| max(part)
 """
-def ourPartitioningScheme(sets, nparts):
+def paddingMinimizingPartition(sets, nparts):
     pass # TODO
-
-print(equalWidthPartition({"hey": [5,10,11,13,15,35,50,55,72,92,204,215], "hn": [2,10,11,13,5,35,100,55,72,92,9,21], "heyn": [2,10,11,13,15,35,50,55,72,92,9,21]}, 3))
-print(equalDepthPartition({"hey": [5,10,11,13,15,35,50,55,72,92,204,215], "hn": [2,10,11,13,5,35,100,55,72,92,9,21], "heyn": [2,10,11,13,15,35,50,55,72,92,9,21]}, 3))
 
