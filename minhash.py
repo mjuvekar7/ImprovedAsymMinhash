@@ -7,6 +7,7 @@ A simple minwise hashing implementation.
 from functools import reduce
 from math import inf
 from random import randint
+import json
 
 class MinHasher:
     """
@@ -16,7 +17,7 @@ class MinHasher:
     """
     def generateParameters(outfile):
         PRIME = 2003
-        COUNT = 128
+        COUNT = 160
 
         hashes = []
         f = open(outfile, 'w')
@@ -42,8 +43,9 @@ class MinHasher:
     Get the vocabulary of a collection of sets.
     A vocabulary is a dictionary that assigns each unique element a numeric ID.
     """
+    @staticmethod
     def getVocab(sets):
-        vocab_set = reduce(lambda x, y : x.union(y), sets)
+        vocab_set = reduce(lambda x, y : x.union(y), list(sets.values()))
         vocab_count = 0
         vocabulary = {}
         for word in vocab_set:
@@ -68,7 +70,7 @@ class MinHasher:
         for shingle in in_set:
             rownum = self.vocabulary[shingle]
             for i in range(len(self.hash_params)):
-                hashed_rownum = get_hash(rownum, self.hash_params[i])
+                hashed_rownum = MinHasher.getHash(rownum, self.hash_params[i])
                 if hashed_rownum < signature[i]:
                     signature[i] = hashed_rownum
         return signature
@@ -77,16 +79,38 @@ class MinHasher:
     Get signatures for all sets.
     Output: { set_id : signature }
     """
-    def getAllSignatures(self):
+    def getAllSignatures(self, progress=True):
+        count = 0
+        total = len(self.sets)
+
         if len(self.signatures) == len(self.sets):
+            if progress:
+                print('MH: Found saved signatures. No need to generate.')
             return self.signatures
+
+        if progress:
+            print('MH: Generating all signatures...')
 
         sigs = {}
         for set_id, dataset in self.sets.items():
+            if progress and count % 100 == 0:
+                print('MH:', count, "done.", total - count, "left.")
             signature = self.minhash(dataset)
             sigs[set_id] = signature
+            count += 1
 
         self.signatures = sigs
+        if self.save_sigs != "":
+            if progress:
+                print('MH: Done generating. Writing to file', self.save_sigs)
+            out_f = open(self.save_sigs, 'w')
+            json.dump(sigs, out_f)
+            out_f.close()
+            if progress:
+                print('MH: Done writing signatures.')
+        else:
+            if progress:
+                print('MH: Done generating.')
         return sigs
 
     """
@@ -96,14 +120,28 @@ class MinHasher:
     the form a,b,c where a, b, and c will be used as universal hash function
     parameters.
     """
-    def __init__(self, datasets, hashparam_file="minhash_params", generate=False):
+    def __init__(self, datasets, hashparam_file="minhash_params",
+            generate=False, vocab=None, load_sigs="", save_sigs=""):
         self.sets = datasets
-        self.vocabulary = getVocab(datasets)
-        if generate:
-            self.hash_params = generateParameters(hashparam_file)
+        if vocab:
+            print('MH: Vocabulary given. No need to compute.')
+            self.vocabulary = vocab
         else:
-            self.hash_params = loadParameters(hashparam_file)
-        self.signatures = {} # no need to compute all signatures unless required.
+            print('MH: Getting vocabulary...')
+            self.vocabulary = MinHasher.getVocab(datasets)
+            print('MH: Done.')
+        if generate:
+            print('MH: Generating hashes.')
+            self.hash_params = MinHasher.generateParameters(hashparam_file)
+        else:
+            print('MH: Loading hashes.')
+            self.hash_params = MinHasher.loadParameters(hashparam_file)
+        if load_sigs == "":
+            self.signatures = {} # no need to compute all signatures unless required.
                              # all signatures will be computed and saved when
                              # first requested.
+        else:
+            print('MH: Loading precomputed signatures.')
+            self.signatures = json.load(open(load_sigs, 'r'))
+        self.save_sigs = save_sigs
 

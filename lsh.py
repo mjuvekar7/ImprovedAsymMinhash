@@ -8,7 +8,7 @@ Designed for use with minhash.
 """
 An example band hash function that can be given to the LSHIndex constructor.
 """
-def band_hash(signature):
+def band_hash(band):
     return hash(str(band))
 
 
